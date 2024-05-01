@@ -2,6 +2,6 @@
 
 namespace LoginManagement\Exception;
 
-class ValidationException
+class ValidationException extends \Exception
 {
 }
