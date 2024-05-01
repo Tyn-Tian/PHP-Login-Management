@@ -1,5 +1,7 @@
 <?php
 
+namespace LoginManagement\Config;
+
 use LoginManagement\Config\Database;
 use PHPUnit\Framework\TestCase;
 
