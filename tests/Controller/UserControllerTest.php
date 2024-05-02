@@ -20,7 +20,7 @@ namespace LoginManagement\Controller {
         private UserController $userController;
         private UserRepository $userRepository;
 
-        public function setUp(): void
+        protected function setUp(): void
         {
             $this->userController = new UserController();
 

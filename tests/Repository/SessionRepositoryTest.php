@@ -12,7 +12,7 @@ class SessionRepositoryTest extends TestCase
     private SessionRepository $sessionRepository;
     private UserRepository $userRepository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->sessionRepository = new SessionRepository(Database::getConnection());
         $this->userRepository = new UserRepository(Database::getConnection());
