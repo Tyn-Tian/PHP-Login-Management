@@ -7,11 +7,18 @@ namespace LoginManagement\App {
     }
 }
 
+namespace LoginManagement\Service {
+    function setcookie(string $name, string $value) 
+    {
+        echo "$name: $value";
+    }
+}
+
 namespace LoginManagement\Controller {
 
     use LoginManagement\Config\Database;
     use LoginManagement\Domain\User;
-    use LoginManagement\Exception\ValidationException;
+    use LoginManagement\Repository\SessionRepository;
     use LoginManagement\Repository\UserRepository;
     use PHPUnit\Framework\TestCase;
 
@@ -19,10 +26,14 @@ namespace LoginManagement\Controller {
     {
         private UserController $userController;
         private UserRepository $userRepository;
+        private SessionRepository $sessionRepository;
 
         protected function setUp(): void
         {
             $this->userController = new UserController();
+
+            $this->sessionRepository = new SessionRepository(Database::getConnection());
+            $this->sessionRepository->deleteAll();
 
             $this->userRepository = new UserRepository(Database::getConnection());
             $this->userRepository->deleteAll();
@@ -116,6 +127,7 @@ namespace LoginManagement\Controller {
             $this->userController->postLogin();
 
             $this->expectOutputRegex("[Location: /]");
+            $this->expectOutputRegex("[X-TYN-SESSION: ]");
         }
 
         public function testLoginValidationError()
