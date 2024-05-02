@@ -5,6 +5,7 @@ namespace LoginManagement\Service;
 use LoginManagement\Config\Database;
 use LoginManagement\Domain\User;
 use LoginManagement\Exception\ValidationException;
+use LoginManagement\Model\UserLoginRequest;
 use LoginManagement\Model\UserRegisterRequest;
 use LoginManagement\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
@@ -67,5 +68,49 @@ class UserServiceTest extends TestCase
         $request->name = "testName";
         $request->password = "testPassword";
         $this->userService->register($request);
+    }
+
+    public function testLoginNotFound()
+    {
+        $request = new UserLoginRequest();
+        $request->id = "testId";
+        $request->password = "testName";
+
+        $this->expectException(ValidationException::class);
+
+        $this->userService->login($request);
+    }
+
+    public function testLoginWrongPassword()
+    {
+        $user = new User();
+        $user->id = "testId";
+        $user->name = "testName";
+        $user->password = password_hash("testPassword", PASSWORD_BCRYPT);
+
+        $this->expectException(ValidationException::class);
+
+        $request = new UserLoginRequest();
+        $request->id = "testIdSalah";
+        $request->password = "testName";
+
+        $this->userService->login($request);
+    }
+
+    public function testLoginSuccess()
+    {
+        $user = new User();
+        $user->id = "testId";
+        $user->name = "testName";
+        $user->password = password_hash("testPassword", PASSWORD_BCRYPT);
+
+        $request = new UserLoginRequest();
+        $request->id = "testId";
+        $request->password = "testName";
+
+        $response = $this->userService->login($request);
+
+        self::assertEquals($request->id, $response->user->id);
+        self::assertTrue(password_verify($request->id, $response->user->id));
     }
 }
