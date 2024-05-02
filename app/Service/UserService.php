@@ -6,6 +6,8 @@ use Exception;
 use LoginManagement\Config\Database;
 use LoginManagement\Domain\User;
 use LoginManagement\Exception\ValidationException;
+use LoginManagement\Model\UserLoginRequest;
+use LoginManagement\Model\UserLoginResponse;
 use LoginManagement\Model\UserRegisterRequest;
 use LoginManagement\Model\UserRegisterResponse;
 use LoginManagement\Repository\UserRepository;
@@ -48,13 +50,42 @@ class UserService
         }
     }
 
-    public function validateUserRegistrationRequest(UserRegisterRequest $request)
+    private function validateUserRegistrationRequest(UserRegisterRequest $request)
     {
         if (
             $request->id == null || $request->name == null || $request->password == null ||
             trim($request->id) == "" || trim($request->name) == "" || trim($request->password) == ""
         ) {
             throw new ValidationException("Id, Name, Password cannot blank");
+        }
+    }
+
+    public function login(UserLoginRequest $request)
+    {
+        $this->validateUserLoginRequest($request);
+
+        $user = $this->userRepository->findById($request->id);
+
+        if ($user == null) {
+            throw new ValidationException("Id or password is wrong");
+        }
+
+        if (password_verify($request->password, $user->password)) {
+            $response = new UserLoginResponse();
+            $response->user = $user;
+            return $response;
+        } else {
+            throw new ValidationException("Id or password is wrong");
+        }
+    }
+
+    private function validateUserLoginRequest(UserLoginRequest $request)
+    {
+        if (
+            $request->id == null || $request->password == null ||
+            trim($request->id) == "" || trim($request->password) == ""
+        ) {
+            throw new ValidationException("Id and Password cannot blank");
         }
     }
 }
