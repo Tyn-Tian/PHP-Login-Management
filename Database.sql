@@ -9,7 +9,7 @@ create table users(
 ) engine = InnoDB;
 
 create table sessions(
-	id varchar(255),
+	id varchar(255) primary key,
     user_id varchar(255) not null,
     constraint fk_sessions_user
     foreign key (user_id) references users(id)

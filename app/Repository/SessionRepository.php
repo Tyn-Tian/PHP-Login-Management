@@ -32,6 +32,8 @@ class SessionRepository
                 $session->id = $row["id"];
                 $session->userId = $row["user_id"];
                 return $session;
+            } else {
+                return null;
             }
         } finally {
             $statement->closeCursor();
