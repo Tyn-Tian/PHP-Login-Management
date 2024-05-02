@@ -7,18 +7,23 @@ use LoginManagement\Config\Database;
 use LoginManagement\Exception\ValidationException;
 use LoginManagement\Model\UserLoginRequest;
 use LoginManagement\Model\UserRegisterRequest;
+use LoginManagement\Repository\SessionRepository;
 use LoginManagement\Repository\UserRepository;
+use LoginManagement\Service\SessionService;
 use LoginManagement\Service\UserService;
 
 class UserController
 {
     private UserService $userService;
+    private SessionService $sessionService;
 
     public function __construct()
     {
         $connection = Database::getConnection();
         $userRepository = new UserRepository($connection);
+        $sessionRepository = new SessionRepository($connection);
         $this->userService = new UserService($userRepository);
+        $this->sessionService = new SessionService($sessionRepository, $userRepository);
     }
 
     public function register(): void
@@ -61,6 +66,7 @@ class UserController
 
         try {
             $response = $this->userService->login($request);
+            $this->sessionService->create($response->user->id);
             View::redirect("/");
         } catch (ValidationException $exception) {
             View::render("Users/login", [
