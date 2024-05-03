@@ -1,13 +1,8 @@
 <?php
 
-namespace LoginManagement\App {
-    function header(string $value)
-    {
-        echo $value;
-    }
-}
-
 namespace LoginManagement\Middleware {
+
+    require_once __DIR__ . "/../Helper/helper.php";
 
     use LoginManagement\Config\Database;
     use LoginManagement\Domain\Session;

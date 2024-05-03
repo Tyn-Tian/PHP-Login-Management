@@ -2,19 +2,14 @@
 
 namespace LoginManagement\Service;
 
+require_once __DIR__ . "/../Helper/helper.php";
+
 use LoginManagement\Config\Database;
 use LoginManagement\Domain\Session;
 use LoginManagement\Domain\User;
 use LoginManagement\Repository\SessionRepository;
 use LoginManagement\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
-
-use function PHPUnit\Framework\assertEquals;
-
-function setcookie(string $name, string $value) 
-{
-    echo "$name: $value";
-}
 
 class SessionServiceTest extends TestCase
 {

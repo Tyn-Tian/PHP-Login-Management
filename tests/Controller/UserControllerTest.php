@@ -1,20 +1,8 @@
 <?php
 
-namespace LoginManagement\App {
-    function header(string $value)
-    {
-        echo $value;
-    }
-}
-
-namespace LoginManagement\Service {
-    function setcookie(string $name, string $value) 
-    {
-        echo "$name: $value";
-    }
-}
-
 namespace LoginManagement\Controller {
+
+    require_once __DIR__ . "/../Helper/helper.php";
 
     use LoginManagement\Config\Database;
     use LoginManagement\Domain\Session;
