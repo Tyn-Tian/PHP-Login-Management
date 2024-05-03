@@ -6,6 +6,7 @@ use LoginManagement\Config\Database;
 use LoginManagement\Domain\User;
 use LoginManagement\Exception\ValidationException;
 use LoginManagement\Model\UserLoginRequest;
+use LoginManagement\Model\UserProfileUpdateRequest;
 use LoginManagement\Model\UserRegisterRequest;
 use LoginManagement\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
@@ -115,4 +116,44 @@ class UserServiceTest extends TestCase
         self::assertTrue(password_verify($request->password, $response->user->password));
     }
 
+    public function testUpdateSuccess()
+    {
+        $user = new User();
+        $user->id = "testId";
+        $user->name = "testName";
+        $user->password = password_hash("testPassword", PASSWORD_BCRYPT);
+        $this->userRepository->save($user);
+
+        $request = new UserProfileUpdateRequest();
+        $request->id = $user->id;
+        $request->name = "testNameChange";
+
+        $this->userService->updateProfile($request);
+
+        $result = $this->userRepository->findById($user->id);
+
+        self::assertEquals($request->name, $result->name);
+    }
+
+    public function testUpdateValidationError()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = new UserProfileUpdateRequest();
+        $request->id = "";
+        $request->name = "";
+
+        $this->userService->updateProfile($request);
+    }
+
+    public function testUpdateNotFound()
+    {
+        $this->expectException(ValidationException::class);
+
+        $request = new UserProfileUpdateRequest();
+        $request->id = "testId";
+        $request->name = "testName";
+
+        $this->userService->updateProfile($request);
+    }
 }
