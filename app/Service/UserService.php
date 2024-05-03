@@ -8,6 +8,8 @@ use LoginManagement\Domain\User;
 use LoginManagement\Exception\ValidationException;
 use LoginManagement\Model\UserLoginRequest;
 use LoginManagement\Model\UserLoginResponse;
+use LoginManagement\Model\UserProfileUpdateRequest;
+use LoginManagement\Model\UserProfileUpdateResponse;
 use LoginManagement\Model\UserRegisterRequest;
 use LoginManagement\Model\UserRegisterResponse;
 use LoginManagement\Repository\UserRepository;
@@ -44,7 +46,7 @@ class UserService
 
             Database::commitTransaction();
             return $response;
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
             Database::rollBackTransaction();
             throw $exception;
         }
@@ -86,6 +88,43 @@ class UserService
             trim($request->id) == "" || trim($request->password) == ""
         ) {
             throw new ValidationException("Id and Password cannot blank");
+        }
+    }
+
+    public function updateProfile(UserProfileUpdateRequest $request): UserProfileUpdateResponse
+    {
+        $this->validateUserProfileUpdateRequest($request);
+
+        try {
+            Database::beginTransaction();
+
+            $user = $this->userRepository->findById($request->id);
+
+            if ($user == null) {
+                throw new ValidationException("User is not found");
+            } 
+
+            $user->name = $request->name;
+            $this->userRepository->update($user);
+
+            Database::commitTransaction();
+
+            $response = new UserProfileUpdateResponse();
+            $response->user = $user;
+            return $response;
+        } catch(\Exception $exception) {
+            Database::rollBackTransaction();
+            throw $exception;
+        }
+    }
+
+    private function validateUserProfileUpdateRequest(UserProfileUpdateRequest $request)
+    {
+        if (
+            $request->id == null || $request->name == null ||
+            trim($request->id) == "" || trim($request->name) == ""
+        ) {
+            throw new ValidationException("Id and Name cannot blank");
         }
     }
 }
