@@ -50,7 +50,7 @@ class UserServiceTest extends TestCase
         $request->name = "";
         $request->password = "";
 
-        $response = $this->userService->register($request);
+        $this->userService->register($request);
     }
 
     public function testRegisterDuplicate()
@@ -103,14 +103,16 @@ class UserServiceTest extends TestCase
         $user->id = "testId";
         $user->name = "testName";
         $user->password = password_hash("testPassword", PASSWORD_BCRYPT);
+        $this->userRepository->save($user);
 
         $request = new UserLoginRequest();
         $request->id = "testId";
-        $request->password = "testName";
+        $request->password = "testPassword";
 
         $response = $this->userService->login($request);
 
         self::assertEquals($request->id, $response->user->id);
-        self::assertTrue(password_verify($request->id, $response->user->id));
+        self::assertTrue(password_verify($request->password, $response->user->password));
     }
+
 }
