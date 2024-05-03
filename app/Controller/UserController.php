@@ -6,6 +6,7 @@ use LoginManagement\App\View;
 use LoginManagement\Config\Database;
 use LoginManagement\Exception\ValidationException;
 use LoginManagement\Model\UserLoginRequest;
+use LoginManagement\Model\UserPasswordUpdateRequest;
 use LoginManagement\Model\UserProfileUpdateRequest;
 use LoginManagement\Model\UserRegisterRequest;
 use LoginManagement\Repository\SessionRepository;
@@ -115,6 +116,36 @@ class UserController
                     "id" => $user->id,
                     "name" => $user->name
                 ]
+            ]);
+        }
+    }
+
+    public function updatePassword()
+    {
+        $user = $this->sessionService->current();
+        View::render("Users/password", [
+            "title" => "Update User Password",
+            "id" => $user->id
+        ]);
+    }
+
+    public function postUpdatePassword()
+    {
+        $user = $this->sessionService->current();
+
+        $request = new UserPasswordUpdateRequest;
+        $request->id = $user->id;
+        $request->oldPassword = $_POST["oldPassword"];
+        $request->newPassword = $_POST["newPassword"];
+
+        try {
+            $this->userService->updatePassword($request);
+            View::redirect("/");
+        } catch (ValidationException $exception) {
+            View::render("Users/password", [
+                "title" => "Update User Password",
+                "error" => $exception->getMessage(),
+                "id" => $user->id
             ]);
         }
     }
