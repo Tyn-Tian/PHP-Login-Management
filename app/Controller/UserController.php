@@ -6,6 +6,7 @@ use LoginManagement\App\View;
 use LoginManagement\Config\Database;
 use LoginManagement\Exception\ValidationException;
 use LoginManagement\Model\UserLoginRequest;
+use LoginManagement\Model\UserProfileUpdateRequest;
 use LoginManagement\Model\UserRegisterRequest;
 use LoginManagement\Repository\SessionRepository;
 use LoginManagement\Repository\UserRepository;
@@ -33,7 +34,7 @@ class UserController
         ]);
     }
 
-    public function postRegister(): void 
+    public function postRegister(): void
     {
         $request = new UserRegisterRequest();
         $request->id = $_POST["id"];
@@ -76,9 +77,45 @@ class UserController
         }
     }
 
-    public function logout(): void 
+    public function logout(): void
     {
         $this->sessionService->destory();
         View::redirect("/");
+    }
+
+    public function updateProfile()
+    {
+        $user = $this->sessionService->current();
+
+        View::render("Users/profile", [
+            "title" => "Update User Profile",
+            "user" => [
+                "id" => $user->id,
+                "name" => $user->name
+            ]
+        ]);
+    }
+
+    public function postUpdateProfile()
+    {
+        $user = $this->sessionService->current();
+
+        $request = new UserProfileUpdateRequest();
+        $request->id = $user->id;
+        $request->name = $_POST["name"];
+
+        try {
+            $this->userService->updateProfile($request);
+            View::redirect("/");
+        } catch (ValidationException $exception) {
+            View::render("Users/profile", [
+                "title" => "Update User Profile",
+                "error" => $exception->getMessage(),
+                "user" => [
+                    "id" => $user->id,
+                    "name" => $user->name
+                ]
+            ]);
+        }
     }
 }
